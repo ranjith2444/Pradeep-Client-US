@@ -1,0 +1,21 @@
+- name: example-scaledobject
+- namespace: default
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggerType1: """test=test1"""
+- name: example-scaledobject
+- namespace: default
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggerType1: 
+- name: example-scaledobject
+- namespace: default
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggerType1: 
