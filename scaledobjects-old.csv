@@ -1,0 +1,6 @@
+name,namespace,pollingInterval,cooldownPeriod,minReplicaCount,maxReplicaCount,triggerType1,,,,,,,,,
+example-scaledobject,default,30,300,1,10,kafka,kafka:9092,group1,topic1,100,kafka,kafka:9093,group2,topic2,200
+example-scaledobject-1,default,30,300,1,10,kafka,kafka:9092,group1,topic1,100,kafka,kafka:9093,group2,topic2,200
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+example-scaledobject-2,default,30,300,1,10,kafka,kafka:9092,group1,topic1,100,kafka,kafka:9093,group2,topic2,200
