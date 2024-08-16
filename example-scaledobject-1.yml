@@ -1,0 +1,14 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: example-scaledobject-1-keda
+  namespace: default
+spec:
+  scaleTargetRef:
+    kind: Statefulsets
+    name: example-scaledobject-1
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:

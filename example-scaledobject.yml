@@ -1,0 +1,74 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: example-scaledobject-keda
+  namespace: default
+spec:
+  scaleTargetRef:
+    kind: Statefulsets
+    name: example-scaledobject
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+  - type: kafka
+    metadata:
+      bootstrapServers: 1
+      consumerGroup: 2
+      topic: 3
+      lagThreshold: 4
+  - type: 5
+    metadata:
+      bootstrapServers: 6
+      consumerGroup: 7
+      topic: 8
+      lagThreshold: 9
+  - type: 10
+    metadata:
+      bootstrapServers: 11
+      consumerGroup: 12
+      topic: 13
+      lagThreshold: 14
+  - type: 15
+    metadata:
+      bootstrapServers: 16
+      consumerGroup: 17
+      topic: 18
+      lagThreshold: 19
+  - type: 20
+    metadata:
+      bootstrapServers: 21
+      consumerGroup: 22
+      topic: 23
+      lagThreshold: 24
+  - type: 25
+    metadata:
+      bootstrapServers: 26
+      consumerGroup: 27
+      topic: 28
+      lagThreshold: 29
+  - type: 30
+    metadata:
+      bootstrapServers: 31
+      consumerGroup: 32
+      topic: 33
+      lagThreshold: 34
+  - type: 35
+    metadata:
+      bootstrapServers: 36
+      consumerGroup: 37
+      topic: 38
+      lagThreshold: 39
+  - type: 40
+    metadata:
+      bootstrapServers: 41
+      consumerGroup: 42
+      topic: 43
+      lagThreshold: 44
+  - type: 45
+    metadata:
+      bootstrapServers: 46
+      consumerGroup: 47
+      topic: 48
+      lagThreshold: 49
