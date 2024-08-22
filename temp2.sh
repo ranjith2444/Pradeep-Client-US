@@ -1,12 +1,15 @@
 #!/bin/bash
 
-# Check if CSV file is provided
 if [ -z "$1" ]; then
-  echo "Usage: $0 <input_file.csv>"
+  echo "Usage: $0 <input_file.xlsx>"
   exit 1
 fi
 
 INPUT_FILE=$1
+TEMP_CSV="/tmp/$(basename "$INPUT_FILE" .xlsx).csv"
+
+# Convert XLSX to CSV
+xlsx2csv "$INPUT_FILE" "$TEMP_CSV"
 
 TARGET_COLUMNS=("name" "namespace" "kind" "pollingInterval" "cooldownPeriod" "minReplicaCount" "maxReplicaCount" 
 "trigger1_Type" "trigger1_BootstrapServers" "trigger1_ConsumerGroup" "trigger1_topic" "trigger1_lagthreshold" 
