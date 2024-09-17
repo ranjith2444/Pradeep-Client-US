@@ -1,5 +1,0 @@
-apiVersion: v2
-name: keda-scaledobjects
-description: A Helm chart to deploy KEDA ScaledObjects
-version: 0.1.0
-
