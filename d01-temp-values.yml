@@ -1,0 +1,16 @@
+scaledObjects:
+  - name:  d01-temp
+    namespace: swp-corporate-temp
+    min_replicas: 20 
+    max_replica: 30 
+    cooling_period: 500 
+    scaleTargetRef:
+      #kind: Deployment
+      name: d01-temp
+    triggers:
+      - type: kafka
+        metadata:
+          bootstrapServers: SEIDEVQ05KAF03.GWPDEV.SEIC.COM:9092,SEIDEVQ05KAF02.GWPDEV.SEIC.COM:9092,SEIDEVQ05KAF01.GWPDEV.SEIC.COM:9092 
+          consumerGroup: corporate-actions-loader-file-event-stream-consumer-temp
+          topic: d01_EDB-DRF_LOAD_RECORD_temp
+          lagThreshold: 500 

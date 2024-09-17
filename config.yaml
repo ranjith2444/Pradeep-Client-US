@@ -1,0 +1,5 @@
+enabled_env:
+  - dev: DEV.DEV.SEIC.COM:9092,DEV.DEV.SEIC.COM:9092,DEV.DEV.SEIC.COM:9092
+  - qa: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092
+  - imps: imps.imps.SEIC.COM:9092,imps.imps.SEIC.COM:9092,imps.imps.SEIC.COM:9092
+  - prod: prod.prod.SEIC.COM:9092,prod.prod.SEIC.COM:9092,prod.prod.SEIC.COM:9092

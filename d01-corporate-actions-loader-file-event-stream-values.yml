@@ -1,0 +1,16 @@
+scaledObjects:
+  - name:  d01-corporate-actions-loader-file-event-stream
+    namespace: swp-corporate-actions
+    min_replicas: 10 
+    max_replica: 11 
+    cooling_period: 300 
+    scaleTargetRef:
+      kind: Statefulsets
+      name: d01-corporate-actions-loader-file-event-stream
+    triggers:
+      - type: kafka
+        metadata:
+          bootstrapServers: SEIDEVQ05KAF03.GWPDEV.SEIC.COM:9092,SEIDEVQ05KAF02.GWPDEV.SEIC.COM:9092,SEIDEVQ05KAF01.GWPDEV.SEIC.COM:9092 
+          consumerGroup: corporate-actions-loader-file-event-stream-consumer-temp
+          topic: d01_7
+          lagThreshold: 300 
