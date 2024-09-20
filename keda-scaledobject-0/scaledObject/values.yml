@@ -12,60 +12,92 @@ scaledObjects:
       - type: 4
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-5
+          consumerGroup: 5
           topic: q01_6
           lagThreshold: 300 
       - type: 4
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-8
+          consumerGroup: 8
           topic: q01_9
           lagThreshold: 300 
       - type: 10
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-11
+          consumerGroup: 11
           topic: q01_12
           lagThreshold: 300 
       - type: 13
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-14
+          consumerGroup: 14
           topic: q01_15
           lagThreshold: 300 
       - type: 16
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-17
+          consumerGroup: 17
           topic: q01_18
           lagThreshold: 300 
       - type: 19
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-20
+          consumerGroup: 20
           topic: q01_21
           lagThreshold: 300 
       - type: 22
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-23
+          consumerGroup: 23
           topic: q01_24
           lagThreshold: 300 
       - type: 25
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-26
+          consumerGroup: 26
           topic: q01_27
           lagThreshold: 300 
       - type: 28
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-29
+          consumerGroup: 29
           topic: q01_30
           lagThreshold: 300 
       - type: 31
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: q01-32
+          consumerGroup: 32
           topic: q01_33
           lagThreshold: 300 
+  - name:  q01-temp
+    namespace: swp-corporate-temp
+    pollingInterval: 77 
+    cooldownPeriod: 500 
+    minReplicaCount: 78 
+    maxReplicaCount: 79 
+    scaleTargetRef:
+      #kind: Deployment
+      name: q01-temp
+    triggers:
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: corporate-actions-loader-file-event-stream-consumer-temp
+          topic: q01_EDB-DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+  - name:  q01-zzzzzzzzz
+    namespace: swp-corporate-temp
+    pollingInterval: 77 
+    cooldownPeriod: 500 
+    minReplicaCount: 78 
+    maxReplicaCount: 79 
+    scaleTargetRef:
+      #kind: Deployment
+      name: q01-zzzzzzzzz
+    triggers:
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: corporate-actions-loader-file-event-stream-consumer-temp
+          topic: q01_EDB-DRF_LOAD_RECORD_temp
+          lagThreshold: 500 

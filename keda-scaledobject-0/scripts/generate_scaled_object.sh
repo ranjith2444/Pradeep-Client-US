@@ -59,8 +59,8 @@ for col in "${TARGET_COLUMNS[@]}"; do
         fi
     done
 done
-OUTPUT_VALUES_FILE="values.yml"
-   
+OUTPUT_VALUES_FILE="./scaledObject/values.yml"
+ > $OUTPUT_VALUES_FILE  
     echo "scaledObjects:" >> "$OUTPUT_VALUES_FILE"
 while IFS=, read -r -a line; do
     if [[ -z "${line[*]}" ]]; then
@@ -412,7 +412,7 @@ while IFS=, read -r -a line; do
         fi
     fi
     ########## Trigger10 #########
-
+    
     echo "Created YAML file: $OUTPUT_VALUES_FILE"
 done < <(tail -n +2 "$INPUT_FILE")
 
