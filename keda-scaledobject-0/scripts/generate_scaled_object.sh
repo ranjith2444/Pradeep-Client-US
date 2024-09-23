@@ -18,15 +18,18 @@ slaBased_cooling_period="500"
 slaBased_thershold_lag="500"
 
 
-if [ -z "$1" ] || [ -z "$2" ]|| [ -z "$3" ]|| [ -z "$4" ]; then
-  echo "Usage: $0 <input_file.csv> env_name=<env_name> sub_env=<sub_env_name>"
+chars_to_replace="{{ENV}}"
+
+if [ -z "$1" ] || [ -z "$2" ]|| [ -z "$3" ]; then
+  echo "Usage: $0 <input_file.csv> env_name=<env_name> sub_env=<sub_env_name> consumer_group_sub_env=<consumer_group_sub_env> topic_sub_env=<topic_sub_env>"
   exit 1
 fi
 
 input_file=$1
 env_name=${2#*=}
 sub_env=${3#*=}
-consumer_group_sub_env=${4#*=}
+# consumer_group_sub_env=${4#*=}
+# topic_sub_env=${5#*=}
 
 echo "Input file: $input_file"
 echo "Environment name: $env_name"
@@ -113,13 +116,22 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[5]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[5]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[6]}]}"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup1=$(echo "${line[${COLUMN_INDEXES[5]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup1" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup1=$(echo "${line[${COLUMN_INDEXES[5]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup1" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic1=$(echo "${line[${COLUMN_INDEXES[6]}]}" | sed "s/$chars_to_replace/$sub_env/")
             echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic1=$(echo "${line[${COLUMN_INDEXES[6]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # fi    
+
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -144,13 +156,23 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[8]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[8]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[9]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup2=$(echo "${line[${COLUMN_INDEXES[8]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup2" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup2=$(echo "${line[${COLUMN_INDEXES[8]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup2" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic2=$(echo "${line[${COLUMN_INDEXES[9]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic2" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic2=$(echo "${line[${COLUMN_INDEXES[9]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic2" >> "$OUTPUT_VALUES_FILE"
+        # fi 
+
+
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -175,13 +197,23 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[11]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[11]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[12]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup3=$(echo "${line[${COLUMN_INDEXES[11]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup3" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup3=$(echo "${line[${COLUMN_INDEXES[11]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup3" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic3=$(echo "${line[${COLUMN_INDEXES[12]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic3" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic3=$(echo "${line[${COLUMN_INDEXES[12]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic3" >> "$OUTPUT_VALUES_FILE"
+        # fi 
+
+
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -206,13 +238,23 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[14]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[14]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[15]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup4=$(echo "${line[${COLUMN_INDEXES[14]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup4" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup4=$(echo "${line[${COLUMN_INDEXES[14]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup4" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic4=$(echo "${line[${COLUMN_INDEXES[15]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic4" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic4=$(echo "${line[${COLUMN_INDEXES[15]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic4" >> "$OUTPUT_VALUES_FILE"
+        # fi 
+
+
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -238,13 +280,23 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[17]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[17]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[18]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup5=$(echo "${line[${COLUMN_INDEXES[17]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup5" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup5=$(echo "${line[${COLUMN_INDEXES[17]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup5" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic5=$(echo "${line[${COLUMN_INDEXES[18]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic5" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic5=$(echo "${line[${COLUMN_INDEXES[18]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic5" >> "$OUTPUT_VALUES_FILE"
+        # fi 
+
+
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -269,13 +321,23 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[20]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[20]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[21]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup6=$(echo "${line[${COLUMN_INDEXES[20]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup6" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup6=$(echo "${line[${COLUMN_INDEXES[20]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup6" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic6=$(echo "${line[${COLUMN_INDEXES[21]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic6" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic6=$(echo "${line[${COLUMN_INDEXES[21]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic6" >> "$OUTPUT_VALUES_FILE"
+        # fi 
+
+
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -300,13 +362,23 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[23]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[23]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[24]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup7=$(echo "${line[${COLUMN_INDEXES[23]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup7" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup7=$(echo "${line[${COLUMN_INDEXES[23]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup7" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic7=$(echo "${line[${COLUMN_INDEXES[24]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic7" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic7=$(echo "${line[${COLUMN_INDEXES[24]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic7" >> "$OUTPUT_VALUES_FILE"
+        # fi 
+
+
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -334,13 +406,23 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[26]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[26]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[27]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup8=$(echo "${line[${COLUMN_INDEXES[26]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup8" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup8=$(echo "${line[${COLUMN_INDEXES[26]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup8" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic8=$(echo "${line[${COLUMN_INDEXES[27]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic8" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic8=$(echo "${line[${COLUMN_INDEXES[27]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic8" >> "$OUTPUT_VALUES_FILE"
+        # fi 
+
+
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -367,13 +449,23 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[29]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[29]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[30]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup9=$(echo "${line[${COLUMN_INDEXES[29]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup9" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup9=$(echo "${line[${COLUMN_INDEXES[29]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup9" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic9=$(echo "${line[${COLUMN_INDEXES[30]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic9" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic9=$(echo "${line[${COLUMN_INDEXES[30]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic9" >> "$OUTPUT_VALUES_FILE"
+        # fi 
+
+            
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
@@ -398,18 +490,27 @@ while IFS=, read -r -a line; do
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
-        if [ $consumer_group_sub_env == "yes" ]; then
-            echo "          consumerGroup: $sub_env-${line[${COLUMN_INDEXES[32]}]}" >> "$OUTPUT_VALUES_FILE"
-        elif [ $consumer_group_sub_env == "no" ]; then
-            echo "          consumerGroup: ${line[${COLUMN_INDEXES[32]}]}" >> "$OUTPUT_VALUES_FILE"
-        fi    
-            topic1="${sub_env}_${line[${COLUMN_INDEXES[33]}]}"
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+        # if [ $consumer_group_sub_env == "yes" ]; then
+            consumerGroup10=$(echo "${line[${COLUMN_INDEXES[32]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          consumerGroup: $consumerGroup10" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $consumer_group_sub_env == "no" ]; then
+        #     consumerGroup10=$(echo "${line[${COLUMN_INDEXES[32]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          consumerGroup: $consumerGroup10" >> "$OUTPUT_VALUES_FILE"
+        # fi
+
+        # if [ $topic_sub_env == "yes" ]; then
+            topic10=$(echo "${line[${COLUMN_INDEXES[33]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            echo "          topic: $topic10" >> "$OUTPUT_VALUES_FILE"
+        # elif [ $topic_sub_env == "no" ]; then
+        #     topic10=$(echo "${line[${COLUMN_INDEXES[33]}]}" | sed "s/$chars_to_replace/""/")
+        #     echo "          topic: $topic10" >> "$OUTPUT_VALUES_FILE"
+        # fi 
         if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
             echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
             echo "          lagThreshold: $slaBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
         fi
+
     fi
     ########## Trigger10 #########
     

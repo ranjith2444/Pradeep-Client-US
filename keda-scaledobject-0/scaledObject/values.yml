@@ -1,76 +1,76 @@
 scaledObjects:
-  - name:  q01-corporate-actions-loader-file-event-stream
-    namespace: swp-corporate-actions
-    pollingInterval: 23 
-    cooldownPeriod: 300 
-    minReplicaCount: 10 
-    maxReplicaCount: 11 
+  - name:  q01-asasda
+    namespace: swp-corporate-temp
+    pollingInterval: 77 
+    cooldownPeriod: 500 
+    minReplicaCount: 78 
+    maxReplicaCount: 79 
     scaleTargetRef:
-      kind: Statefulsets
-      name: q01-corporate-actions-loader-file-event-stream
+      #kind: Deployment
+      name: q01-asasda
     triggers:
-      - type: 4
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: q011
+          topic: q012
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: 3
+          topic: 4
+          lagThreshold: 500 
+      - type: kafka
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
           consumerGroup: 5
-          topic: q01_6
-          lagThreshold: 300 
-      - type: 4
+          topic: 6
+          lagThreshold: 500 
+      - type: kafka
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: 8
-          topic: q01_9
-          lagThreshold: 300 
-      - type: 10
+          consumerGroup: 7
+          topic: 8
+          lagThreshold: 500 
+      - type: kafka
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: 11
-          topic: q01_12
-          lagThreshold: 300 
-      - type: 13
+          consumerGroup: q01-9
+          topic: q01_10
+          lagThreshold: 500 
+      - type: kafka
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: 14
-          topic: q01_15
-          lagThreshold: 300 
-      - type: 16
+          consumerGroup: q0111
+          topic: q0112
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: q0113
+          topic: q0114
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: q0115
+          topic: q0116
+          lagThreshold: 500 
+      - type: kafka
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
           consumerGroup: 17
-          topic: q01_18
-          lagThreshold: 300 
-      - type: 19
+          topic: 18
+          lagThreshold: 500 
+      - type: kafka
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: 20
-          topic: q01_21
-          lagThreshold: 300 
-      - type: 22
-        metadata:
-          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: 23
-          topic: q01_24
-          lagThreshold: 300 
-      - type: 25
-        metadata:
-          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: 26
-          topic: q01_27
-          lagThreshold: 300 
-      - type: 28
-        metadata:
-          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: 29
-          topic: q01_30
-          lagThreshold: 300 
-      - type: 31
-        metadata:
-          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: 32
-          topic: q01_33
-          lagThreshold: 300 
+          consumerGroup: q0119
+          topic: q0120
+          lagThreshold: 500 
   - name:  q01-temp
-    namespace: swp-corporate-temp
+    namespace: temp
     pollingInterval: 77 
     cooldownPeriod: 500 
     minReplicaCount: 78 
@@ -82,22 +82,60 @@ scaledObjects:
       - type: kafka
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: corporate-actions-loader-file-event-stream-consumer-temp
-          topic: q01_EDB-DRF_LOAD_RECORD_temp
+          consumerGroup: loader-file-event-stream-consumer-temp
+          topic: EDB_DRF_LOAD_RECORD_temp
           lagThreshold: 500 
-  - name:  q01-zzzzzzzzz
-    namespace: swp-corporate-temp
-    pollingInterval: 77 
-    cooldownPeriod: 500 
-    minReplicaCount: 78 
-    maxReplicaCount: 79 
-    scaleTargetRef:
-      #kind: Deployment
-      name: q01-zzzzzzzzz
-    triggers:
       - type: kafka
         metadata:
           bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
-          consumerGroup: corporate-actions-loader-file-event-stream-consumer-temp
-          topic: q01_EDB-DRF_LOAD_RECORD_temp
+          consumerGroup: q01loader-file-event-stream-consumer-temp
+          topic: q01EDB_DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: q01loader-file-event-stream-consumer-temp
+          topic: q01EDB_DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: q01loader-file-event-stream-consumer-temp
+          topic: q01EDB_DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: loader-file-event-stream-consumer-temp
+          topic: EDB_DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: loader-file-event-stream-consumer-temp
+          topic: EDB_DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: loader-file-event-stream-consumer-temp
+          topic: EDB_DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: loader-file-event-stream-consumer-temp
+          topic: EDB_DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: q01loader-file-event-stream-consumer-temp
+          topic: q01EDB_DRF_LOAD_RECORD_temp
+          lagThreshold: 500 
+      - type: kafka
+        metadata:
+          bootstrapServers: QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092 
+          consumerGroup: loader-file-event-stream-consumer-temp
+          topic: EDB_DRF_LOAD_RECORD_temp
           lagThreshold: 500 
