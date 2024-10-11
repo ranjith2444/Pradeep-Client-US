@@ -1,0 +1,5 @@
+test: "test output"
+my-test: "my-test output"
+my-array:
+  - one
+  - two

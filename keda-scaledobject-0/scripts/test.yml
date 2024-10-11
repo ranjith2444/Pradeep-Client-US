@@ -1,0 +1,25 @@
+test: "test output"
+my-test: "my-test output"
+sub_env:
+  - q01
+  - i02
+  - d01
+  - p02
+
+
+zeroBased_polling_Interval: "23"
+zeroBased_min_replica: "10"
+zeroBased_max_replica: "11"
+zeroBased_cooling_period: "300"
+zeroBased_thershold_lag: "300"
+
+slaBased_polling_Interval: "77"
+slaBased_min_replica: "78"
+slaBased_max_replica: "79"
+slaBased_cooling_period: "500"
+slaBased_thershold_lag: "500"
+
+dev_bootstrap_config: "SEIDEVQ05KAF03.GWPDEV.SEIC.COM:9092,SEIDEVQ05KAF02.GWPDEV.SEIC.COM:9092,SEIDEVQ05KAF01.GWPDEV.SEIC.COM:9092"
+qa_bootstrap_config: "QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092"
+imps_bootstrap_config: "imps.imps.SEIC.COM:9092,imps.imps.SEIC.COM:9092,imps.imps.SEIC.COM:9092"
+prod_bootstrap_config: "prod.prod.SEIC.COM:9092,prod.prod.SEIC.COM:9092,prod.prod.SEIC.COM:9092"

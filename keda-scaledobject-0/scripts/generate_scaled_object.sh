@@ -1,33 +1,39 @@
 #!/bin/bash
 
-dev_bootstrap_config="SEIDEVQ05KAF03.GWPDEV.SEIC.COM:9092,SEIDEVQ05KAF02.GWPDEV.SEIC.COM:9092,SEIDEVQ05KAF01.GWPDEV.SEIC.COM:9092"
-qa_bootstrap_config="QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092,QA.QA.SEIC.COM:9092"
-imps_bootstrap_config="imps.imps.SEIC.COM:9092,imps.imps.SEIC.COM:9092,imps.imps.SEIC.COM:9092"
-prod_bootstrap_config="prod.prod.SEIC.COM:9092,prod.prod.SEIC.COM:9092,prod.prod.SEIC.COM:9092"
+dev_bootstrap_config=$(niet dev_bootstrap_config ./scripts/test.yml)
+qa_bootstrap_config=$(niet qa_bootstrap_config ./scripts/test.yml)
+imps_bootstrap_config=$(niet imps_bootstrap_config ./scripts/test.yml)
+prod_bootstrap_config=$(niet prod_bootstrap_config ./scripts/test.yml)
 
-zeroBased_polling_Interval="23"
-zeroBased_min_replica="10"
-zeroBased_max_replica="11"
-zeroBased_cooling_period="300"
-zeroBased_thershold_lag="300"
+list_of_sub_env=$(niet sub_env ./scripts/test.yml)
 
-slaBased_polling_Interval="77"
-slaBased_min_replica="78"
-slaBased_max_replica="79"
-slaBased_cooling_period="500"
-slaBased_thershold_lag="500"
+IFS=$'\n' read -rd '' -a sub_env_array <<< "$list_of_sub_env"
+
+
+
+zeroBased_polling_Interval=$(niet zeroBased_polling_Interval ./scripts/test.yml)
+zeroBased_min_replica=$(niet zeroBased_min_replica ./scripts/test.yml)
+zeroBased_max_replica=$(niet zeroBased_max_replica ./scripts/test.yml)
+zeroBased_cooling_period=$(niet zeroBased_cooling_period ./scripts/test.yml)
+zeroBased_thershold_lag=$(niet zeroBased_thershold_lag ./scripts/test.yml)
+
+slaBased_polling_Interval=$(niet slaBased_polling_Interval ./scripts/test.yml)
+slaBased_min_replica=$(niet slaBased_min_replica ./scripts/test.yml)
+slaBased_max_replica=$(niet slaBased_max_replica ./scripts/test.yml)
+slaBased_cooling_period=$(niet slaBased_cooling_period ./scripts/test.yml)
+slaBased_thershold_lag=$(niet slaBased_thershold_lag ./scripts/test.yml)
 
 
 chars_to_replace="{{ENV}}"
 
-if [ -z "$1" ] || [ -z "$2" ]|| [ -z "$3" ]; then
-  echo "Usage: $0 <input_file.csv> env_name=<env_name> sub_env=<sub_env_name> consumer_group_sub_env=<consumer_group_sub_env> topic_sub_env=<topic_sub_env>"
+if [ -z "$1" ] ; then
+  echo "Usage: $0 <input_file.csv> "
   exit 1
 fi
 
 input_file=$1
-env_name=${2#*=}
-sub_env=${3#*=}
+
+
 # consumer_group_sub_env=${4#*=}
 # topic_sub_env=${5#*=}
 
@@ -62,102 +68,120 @@ for col in "${TARGET_COLUMNS[@]}"; do
         fi
     done
 done
+
+
+
 OUTPUT_VALUES_FILE="./scaledObject/values.yml"
  > $OUTPUT_VALUES_FILE  
     echo "scaledObjects:" >> "$OUTPUT_VALUES_FILE"
-while IFS=, read -r -a line; do
-    if [[ -z "${line[*]}" ]]; then
-        continue
-    fi
 
-    filename="${line[${COLUMN_INDEXES[0]}]}"
-    if [ -z "$filename" ]; then
-        continue
-    fi
-   
-    
-    echo "  - name:  $sub_env-${line[${COLUMN_INDEXES[0]}]}" >> "$OUTPUT_VALUES_FILE"
-    echo "    namespace: ${line[${COLUMN_INDEXES[1]}]}" >> "$OUTPUT_VALUES_FILE"
-    if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
-        echo "    pollingInterval: $zeroBased_polling_Interval " >> "$OUTPUT_VALUES_FILE"
-        echo "    cooldownPeriod: $zeroBased_cooling_period " >> "$OUTPUT_VALUES_FILE"
-        echo "    minReplicaCount: $zeroBased_min_replica " >> "$OUTPUT_VALUES_FILE"
-        echo "    maxReplicaCount: $zeroBased_max_replica " >> "$OUTPUT_VALUES_FILE"
-    elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
-        echo "    pollingInterval: $slaBased_polling_Interval " >> "$OUTPUT_VALUES_FILE"
-        echo "    cooldownPeriod: $slaBased_cooling_period " >> "$OUTPUT_VALUES_FILE"
-        echo "    minReplicaCount: $slaBased_min_replica " >> "$OUTPUT_VALUES_FILE"
-        echo "    maxReplicaCount: $slaBased_max_replica " >> "$OUTPUT_VALUES_FILE"
-    fi  
-        echo "    scaleTargetRef:" >> "$OUTPUT_VALUES_FILE"
-    if [ "${line[${COLUMN_INDEXES[2]}]}" == "Deployment" ]; then
-        echo "      #kind: ${line[${COLUMN_INDEXES[2]}]}" >> "$OUTPUT_VALUES_FILE"
-        echo "      name: $sub_env-${line[${COLUMN_INDEXES[0]}]}" >> "$OUTPUT_VALUES_FILE"
-    elif [ "${line[${COLUMN_INDEXES[2]}]}" == "Statefulsets" ]; then
-        echo "      kind: ${line[${COLUMN_INDEXES[2]}]}" >> "$OUTPUT_VALUES_FILE"
-        echo "      name: $sub_env-${line[${COLUMN_INDEXES[0]}]}" >> "$OUTPUT_VALUES_FILE"
-    fi
-        echo "    triggers:" >> "$OUTPUT_VALUES_FILE"
-    
+for sub_env in "${sub_env_array[@]}"; do
+  echo "Processing sub_env: $sub_env"
+    while IFS=, read -r -a line; do
+        if [[ -z "${line[*]}" ]]; then
+            continue
+        fi
 
-    ########## trigger 1 #########
-    if [[ "${line[${COLUMN_INDEXES[4]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger1_Type is empty or whitespace hence Skipping Full Trigger1 values"
-    else
-        echo "      - type: ${line[${COLUMN_INDEXES[4]}]}" >> "$OUTPUT_VALUES_FILE"
-        echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
-            echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
-            echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
-            echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
-            echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
+        filename="${line[${COLUMN_INDEXES[0]}]}"
+        if [ -z "$filename" ]; then
+            continue
         fi
             
-        # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup1=$(echo "${line[${COLUMN_INDEXES[5]}]}" | sed "s/$chars_to_replace/$sub_env/")
-            echo "          consumerGroup: $consumerGroup1" >> "$OUTPUT_VALUES_FILE"
-        # elif [ $consumer_group_sub_env == "no" ]; then
-        #     consumerGroup1=$(echo "${line[${COLUMN_INDEXES[5]}]}" | sed "s/$chars_to_replace/""/")
-        #     echo "          consumerGroup: $consumerGroup1" >> "$OUTPUT_VALUES_FILE"
-        # fi
+                temp="$(echo "$sub_env-${line[${COLUMN_INDEXES[0]}]}" | tr -d '\r')"
+                echo "$temp"
+                #echo "  - name:  $sub_env" >> "$OUTPUT_VALUES_FILE"
+                echo "  - name:  $temp" >> "$OUTPUT_VALUES_FILE"
+                echo "    namespace: ${line[${COLUMN_INDEXES[1]}]}" >> "$OUTPUT_VALUES_FILE"            
+                
+                if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
+                    echo "    pollingInterval: $zeroBased_polling_Interval " >> "$OUTPUT_VALUES_FILE"
+                    echo "    cooldownPeriod: $zeroBased_cooling_period " >> "$OUTPUT_VALUES_FILE"
+                    echo "    minReplicaCount: $zeroBased_min_replica " >> "$OUTPUT_VALUES_FILE"
+                    echo "    maxReplicaCount: $zeroBased_max_replica " >> "$OUTPUT_VALUES_FILE"
+                elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
+                    echo "    pollingInterval: $slaBased_polling_Interval " >> "$OUTPUT_VALUES_FILE"
+                    echo "    cooldownPeriod: $slaBased_cooling_period " >> "$OUTPUT_VALUES_FILE"
+                    echo "    minReplicaCount: $slaBased_min_replica " >> "$OUTPUT_VALUES_FILE"
+                    echo "    maxReplicaCount: $slaBased_max_replica " >> "$OUTPUT_VALUES_FILE"
+                fi  
+                
+                echo "    scaleTargetRef:" >> "$OUTPUT_VALUES_FILE"
 
-        # if [ $topic_sub_env == "yes" ]; then
-            topic1=$(echo "${line[${COLUMN_INDEXES[6]}]}" | sed "s/$chars_to_replace/$sub_env/")
-            echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
-        # elif [ $topic_sub_env == "no" ]; then
-        #     topic1=$(echo "${line[${COLUMN_INDEXES[6]}]}" | sed "s/$chars_to_replace/""/")
-        #     echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
-        # fi    
 
-        if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
-            echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
-        elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
-            echo "          lagThreshold: $slaBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
-        fi
-    fi
-    ########## trigger 1 #########
+                if [ "${line[${COLUMN_INDEXES[2]}]}" == "Deployment" ]; then
+                    name="$(echo "$sub_env-${line[${COLUMN_INDEXES[0]}]}" | tr -d '\r')"
+                    echo "      #kind: ${line[${COLUMN_INDEXES[2]}]}" >> "$OUTPUT_VALUES_FILE"
+                    echo "      name: $name" >> "$OUTPUT_VALUES_FILE"
+                elif [ "${line[${COLUMN_INDEXES[2]}]}" == "Statefulsets" ]; then
+                    name="$(echo "$sub_env-${line[${COLUMN_INDEXES[0]}]}" | tr -d '\r')"
+                    echo "      kind: ${line[${COLUMN_INDEXES[2]}]}" >> "$OUTPUT_VALUES_FILE"
+                    echo "      name: $name" >> "$OUTPUT_VALUES_FILE"
+                fi
 
-    ########## trigger 2 #########
+                    echo "    triggers:" >> "$OUTPUT_VALUES_FILE"
+
+            ########## trigger 1 #########
+            if [[ "${line[${COLUMN_INDEXES[4]}]}" =~ ^[[:space:]]*$ ]]; then
+                echo " Trigger1_Type is empty or whitespace hence Skipping Full Trigger1 values"
+            else
+                echo "      - type: ${line[${COLUMN_INDEXES[4]}]}" >> "$OUTPUT_VALUES_FILE"
+                echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
+                if [[ $sub_env == *d* ]]; then
+                    echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
+                elif [[ $sub_env == *q* ]]; then
+                    echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
+                elif [[ $sub_env == *i* ]]; then
+                    echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
+                elif [[ $sub_env == *p* ]]; then
+                    echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
+                fi
+
+                # if [ $consumer_group_sub_env == "yes" ]; then
+                    #name="$(echo "$sub_env-${line[${COLUMN_INDEXES[0]}]}" | tr -d '\r')"
+                    consumerGroup1=$(echo "${line[${COLUMN_INDEXES[5]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
+                    echo "          consumerGroup: $consumerGroup1" >> "$OUTPUT_VALUES_FILE"
+                # elif [ $consumer_group_sub_env == "no" ]; then
+                #     consumerGroup1=$(echo "${line[${COLUMN_INDEXES[5]}]}" | sed "s/$chars_to_replace/""/")
+                #     echo "          consumerGroup: $consumerGroup1" >> "$OUTPUT_VALUES_FILE"
+                # fi
+
+                # if [ $topic_sub_env == "yes" ]; then
+                    topic1=$(echo "${line[${COLUMN_INDEXES[6]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
+                    echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+                # elif [ $topic_sub_env == "no" ]; then
+                #     topic1=$(echo "${line[${COLUMN_INDEXES[6]}]}" | sed "s/$chars_to_replace/""/")
+                #     echo "          topic: $topic1" >> "$OUTPUT_VALUES_FILE"
+                # fi    
+
+                if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
+                    echo "          lagThreshold: $zeroBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
+                elif [ "${line[${COLUMN_INDEXES[3]}]}" == "sla_based" ]; then
+                    echo "          lagThreshold: $slaBased_thershold_lag " >> "$OUTPUT_VALUES_FILE"
+                fi
+
+                    
+                
+            fi
+            ########## trigger 1 #########
+
+                ########## trigger 2 #########
     if [[ "${line[${COLUMN_INDEXES[7]}]}" =~ ^[[:space:]]*$ ]]; then
         echo " Trigger2_Type is empty or whitespace hence Skipping Full Trigger2 values"
     else
         echo "      - type: ${line[${COLUMN_INDEXES[4]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup2=$(echo "${line[${COLUMN_INDEXES[8]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup2=$(echo "${line[${COLUMN_INDEXES[8]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup2" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup2=$(echo "${line[${COLUMN_INDEXES[8]}]}" | sed "s/$chars_to_replace/""/")
@@ -165,7 +189,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic2=$(echo "${line[${COLUMN_INDEXES[9]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic2=$(echo "${line[${COLUMN_INDEXES[9]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic2" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic2=$(echo "${line[${COLUMN_INDEXES[9]}]}" | sed "s/$chars_to_replace/""/")
@@ -187,18 +211,18 @@ while IFS=, read -r -a line; do
     else
         echo "      - type: ${line[${COLUMN_INDEXES[10]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup3=$(echo "${line[${COLUMN_INDEXES[11]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup3=$(echo "${line[${COLUMN_INDEXES[11]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup3" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup3=$(echo "${line[${COLUMN_INDEXES[11]}]}" | sed "s/$chars_to_replace/""/")
@@ -206,7 +230,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic3=$(echo "${line[${COLUMN_INDEXES[12]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic3=$(echo "${line[${COLUMN_INDEXES[12]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic3" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic3=$(echo "${line[${COLUMN_INDEXES[12]}]}" | sed "s/$chars_to_replace/""/")
@@ -228,18 +252,18 @@ while IFS=, read -r -a line; do
     else
         echo "      - type: ${line[${COLUMN_INDEXES[13]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup4=$(echo "${line[${COLUMN_INDEXES[14]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup4=$(echo "${line[${COLUMN_INDEXES[14]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup4" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup4=$(echo "${line[${COLUMN_INDEXES[14]}]}" | sed "s/$chars_to_replace/""/")
@@ -247,7 +271,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic4=$(echo "${line[${COLUMN_INDEXES[15]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic4=$(echo "${line[${COLUMN_INDEXES[15]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic4" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic4=$(echo "${line[${COLUMN_INDEXES[15]}]}" | sed "s/$chars_to_replace/""/")
@@ -270,18 +294,18 @@ while IFS=, read -r -a line; do
     else
         echo "      - type: ${line[${COLUMN_INDEXES[16]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup5=$(echo "${line[${COLUMN_INDEXES[17]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup5=$(echo "${line[${COLUMN_INDEXES[17]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup5" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup5=$(echo "${line[${COLUMN_INDEXES[17]}]}" | sed "s/$chars_to_replace/""/")
@@ -289,7 +313,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic5=$(echo "${line[${COLUMN_INDEXES[18]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic5=$(echo "${line[${COLUMN_INDEXES[18]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic5" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic5=$(echo "${line[${COLUMN_INDEXES[18]}]}" | sed "s/$chars_to_replace/""/")
@@ -311,18 +335,18 @@ while IFS=, read -r -a line; do
     else
         echo "      - type: ${line[${COLUMN_INDEXES[19]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup6=$(echo "${line[${COLUMN_INDEXES[20]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup6=$(echo "${line[${COLUMN_INDEXES[20]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup6" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup6=$(echo "${line[${COLUMN_INDEXES[20]}]}" | sed "s/$chars_to_replace/""/")
@@ -330,7 +354,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic6=$(echo "${line[${COLUMN_INDEXES[21]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic6=$(echo "${line[${COLUMN_INDEXES[21]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic6" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic6=$(echo "${line[${COLUMN_INDEXES[21]}]}" | sed "s/$chars_to_replace/""/")
@@ -352,18 +376,18 @@ while IFS=, read -r -a line; do
     else
         echo "      - type: ${line[${COLUMN_INDEXES[22]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup7=$(echo "${line[${COLUMN_INDEXES[23]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup7=$(echo "${line[${COLUMN_INDEXES[23]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup7" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup7=$(echo "${line[${COLUMN_INDEXES[23]}]}" | sed "s/$chars_to_replace/""/")
@@ -371,7 +395,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic7=$(echo "${line[${COLUMN_INDEXES[24]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic7=$(echo "${line[${COLUMN_INDEXES[24]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic7" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic7=$(echo "${line[${COLUMN_INDEXES[24]}]}" | sed "s/$chars_to_replace/""/")
@@ -396,18 +420,18 @@ while IFS=, read -r -a line; do
     else
         echo "      - type: ${line[${COLUMN_INDEXES[25]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup8=$(echo "${line[${COLUMN_INDEXES[26]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup8=$(echo "${line[${COLUMN_INDEXES[26]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup8" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup8=$(echo "${line[${COLUMN_INDEXES[26]}]}" | sed "s/$chars_to_replace/""/")
@@ -415,7 +439,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic8=$(echo "${line[${COLUMN_INDEXES[27]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic8=$(echo "${line[${COLUMN_INDEXES[27]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic8" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic8=$(echo "${line[${COLUMN_INDEXES[27]}]}" | sed "s/$chars_to_replace/""/")
@@ -439,18 +463,18 @@ while IFS=, read -r -a line; do
     else
         echo "      - type: ${line[${COLUMN_INDEXES[28]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup9=$(echo "${line[${COLUMN_INDEXES[29]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup9=$(echo "${line[${COLUMN_INDEXES[29]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup9" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup9=$(echo "${line[${COLUMN_INDEXES[29]}]}" | sed "s/$chars_to_replace/""/")
@@ -458,7 +482,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic9=$(echo "${line[${COLUMN_INDEXES[30]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic9=$(echo "${line[${COLUMN_INDEXES[30]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic9" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic9=$(echo "${line[${COLUMN_INDEXES[30]}]}" | sed "s/$chars_to_replace/""/")
@@ -480,18 +504,18 @@ while IFS=, read -r -a line; do
     else
         echo "      - type: ${line[${COLUMN_INDEXES[31]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
-        if [ $env_name == "dev" ]; then
+        if [[ $sub_env == *d* ]]; then
             echo "          bootstrapServers: $dev_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "qa" ]; then
+        elif [[ $sub_env == *q* ]]; then
             echo "          bootstrapServers: $qa_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "imps" ]; then
+        elif [[ $sub_env == *i* ]]; then
             echo "          bootstrapServers: $imps_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
-        elif [ $env_name == "prod" ]; then
+        elif [[ $sub_env == *p* ]]; then
             echo "          bootstrapServers: $prod_bootstrap_config " >> "$OUTPUT_VALUES_FILE"
         fi
             
         # if [ $consumer_group_sub_env == "yes" ]; then
-            consumerGroup10=$(echo "${line[${COLUMN_INDEXES[32]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            consumerGroup10=$(echo "${line[${COLUMN_INDEXES[32]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          consumerGroup: $consumerGroup10" >> "$OUTPUT_VALUES_FILE"
         # elif [ $consumer_group_sub_env == "no" ]; then
         #     consumerGroup10=$(echo "${line[${COLUMN_INDEXES[32]}]}" | sed "s/$chars_to_replace/""/")
@@ -499,7 +523,7 @@ while IFS=, read -r -a line; do
         # fi
 
         # if [ $topic_sub_env == "yes" ]; then
-            topic10=$(echo "${line[${COLUMN_INDEXES[33]}]}" | sed "s/$chars_to_replace/$sub_env/")
+            topic10=$(echo "${line[${COLUMN_INDEXES[33]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
             echo "          topic: $topic10" >> "$OUTPUT_VALUES_FILE"
         # elif [ $topic_sub_env == "no" ]; then
         #     topic10=$(echo "${line[${COLUMN_INDEXES[33]}]}" | sed "s/$chars_to_replace/""/")
@@ -513,8 +537,13 @@ while IFS=, read -r -a line; do
 
     fi
     ########## Trigger10 #########
-    
-    echo "Created YAML file: $OUTPUT_VALUES_FILE"
-done < <(tail -n +2 "$INPUT_FILE")
+                
+                echo "Created YAML file: $OUTPUT_VALUES_FILE"
+            done < <(tail -n +2 "$INPUT_FILE")
+
+
+ echo "All valid rows for $sub_env have been written to their respective YAML files."
+done
+
 
 echo "All valid rows have been written to their respective YAML files"
