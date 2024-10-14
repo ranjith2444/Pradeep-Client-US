@@ -1,27 +1,27 @@
 #!/bin/bash
 
-dev_bootstrap_config=$(niet dev_bootstrap_config ./scripts/test.yml)
-qa_bootstrap_config=$(niet qa_bootstrap_config ./scripts/test.yml)
-imps_bootstrap_config=$(niet imps_bootstrap_config ./scripts/test.yml)
-prod_bootstrap_config=$(niet prod_bootstrap_config ./scripts/test.yml)
+dev_bootstrap_config=$(niet dev_bootstrap_config ./config.yml)
+qa_bootstrap_config=$(niet qa_bootstrap_config ./config.yml)
+imps_bootstrap_config=$(niet imps_bootstrap_config ./config.yml)
+prod_bootstrap_config=$(niet prod_bootstrap_config ./config.yml)
 
-list_of_sub_env=$(niet sub_env ./scripts/test.yml)
+list_of_sub_env=$(niet sub_env ./config.yml)
 
 IFS=$'\n' read -rd '' -a sub_env_array <<< "$list_of_sub_env"
 
 
 
-zeroBased_polling_Interval=$(niet zeroBased_polling_Interval ./scripts/test.yml)
-zeroBased_min_replica=$(niet zeroBased_min_replica ./scripts/test.yml)
-zeroBased_max_replica=$(niet zeroBased_max_replica ./scripts/test.yml)
-zeroBased_cooling_period=$(niet zeroBased_cooling_period ./scripts/test.yml)
-zeroBased_thershold_lag=$(niet zeroBased_thershold_lag ./scripts/test.yml)
+zeroBased_polling_Interval=$(niet zeroBased_polling_Interval ./config.yml)
+zeroBased_min_replica=$(niet zeroBased_min_replica ./config.yml)
+zeroBased_max_replica=$(niet zeroBased_max_replica ./config.yml)
+zeroBased_cooling_period=$(niet zeroBased_cooling_period ./config.yml)
+zeroBased_thershold_lag=$(niet zeroBased_thershold_lag ./config.yml)
 
-slaBased_polling_Interval=$(niet slaBased_polling_Interval ./scripts/test.yml)
-slaBased_min_replica=$(niet slaBased_min_replica ./scripts/test.yml)
-slaBased_max_replica=$(niet slaBased_max_replica ./scripts/test.yml)
-slaBased_cooling_period=$(niet slaBased_cooling_period ./scripts/test.yml)
-slaBased_thershold_lag=$(niet slaBased_thershold_lag ./scripts/test.yml)
+slaBased_polling_Interval=$(niet slaBased_polling_Interval ./config.yml)
+slaBased_min_replica=$(niet slaBased_min_replica ./config.yml)
+slaBased_max_replica=$(niet slaBased_max_replica ./config.yml)
+slaBased_cooling_period=$(niet slaBased_cooling_period ./config.yml)
+slaBased_thershold_lag=$(niet slaBased_thershold_lag ./config.yml)
 
 
 chars_to_replace="{{ENV}}"
@@ -86,11 +86,11 @@ for sub_env in "${sub_env_array[@]}"; do
         if [ -z "$filename" ]; then
             continue
         fi
-            
+                temp_name=$(echo "${line[${COLUMN_INDEXES[0]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')
                 temp="$(echo "$sub_env-${line[${COLUMN_INDEXES[0]}]}" | tr -d '\r')"
-                echo "$temp"
+                #echo "$temp"
                 #echo "  - name:  $sub_env" >> "$OUTPUT_VALUES_FILE"
-                echo "  - name:  $temp" >> "$OUTPUT_VALUES_FILE"
+                echo "  - name:  $temp_name" >> "$OUTPUT_VALUES_FILE"
                 echo "    namespace: ${line[${COLUMN_INDEXES[1]}]}" >> "$OUTPUT_VALUES_FILE"            
                 
                 if [ "${line[${COLUMN_INDEXES[3]}]}" == "zero_based" ]; then
@@ -109,11 +109,11 @@ for sub_env in "${sub_env_array[@]}"; do
 
 
                 if [ "${line[${COLUMN_INDEXES[2]}]}" == "Deployment" ]; then
-                    name="$(echo "$sub_env-${line[${COLUMN_INDEXES[0]}]}" | tr -d '\r')"
+                    name="$(echo "${line[${COLUMN_INDEXES[0]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')"
                     echo "      #kind: ${line[${COLUMN_INDEXES[2]}]}" >> "$OUTPUT_VALUES_FILE"
                     echo "      name: $name" >> "$OUTPUT_VALUES_FILE"
                 elif [ "${line[${COLUMN_INDEXES[2]}]}" == "Statefulsets" ]; then
-                    name="$(echo "$sub_env-${line[${COLUMN_INDEXES[0]}]}" | tr -d '\r')"
+                    name="$(echo "${line[${COLUMN_INDEXES[0]}]}" | sed "s/$chars_to_replace/$sub_env/" | tr -d '\r')"
                     echo "      kind: ${line[${COLUMN_INDEXES[2]}]}" >> "$OUTPUT_VALUES_FILE"
                     echo "      name: $name" >> "$OUTPUT_VALUES_FILE"
                 fi
@@ -121,8 +121,9 @@ for sub_env in "${sub_env_array[@]}"; do
                     echo "    triggers:" >> "$OUTPUT_VALUES_FILE"
 
             ########## trigger 1 #########
-            if [[ "${line[${COLUMN_INDEXES[4]}]}" =~ ^[[:space:]]*$ ]]; then
-                echo " Trigger1_Type is empty or whitespace hence Skipping Full Trigger1 values"
+            if [[  "${line[${COLUMN_INDEXES[4]}]}" =~ ^[[:space:]]*$ ]]; then
+                #echo " Trigger1_Type is empty or whitespace hence Skipping Full Trigger1 values"
+                :
             else
                 echo "      - type: ${line[${COLUMN_INDEXES[4]}]}" >> "$OUTPUT_VALUES_FILE"
                 echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -166,7 +167,8 @@ for sub_env in "${sub_env_array[@]}"; do
 
                 ########## trigger 2 #########
     if [[ "${line[${COLUMN_INDEXES[7]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger2_Type is empty or whitespace hence Skipping Full Trigger2 values"
+        #echo " Trigger2_Type is empty or whitespace hence Skipping Full Trigger2 values"
+        :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[4]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -207,7 +209,8 @@ for sub_env in "${sub_env_array[@]}"; do
 
     ########## Trigger3 #########
     if [[ "${line[${COLUMN_INDEXES[10]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger3_Type is empty or whitespace hence Skipping Full Trigger3 values"
+        #echo " Trigger3_Type is empty or whitespace hence Skipping Full Trigger3 values"
+        :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[10]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -248,7 +251,8 @@ for sub_env in "${sub_env_array[@]}"; do
 
          ########## Trigger4 #########
     if [[ "${line[${COLUMN_INDEXES[13]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger4_Type is empty or whitespace hence Skipping Full Trigger4 values"
+        #echo " Trigger4_Type is empty or whitespace hence Skipping Full Trigger4 values"
+        :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[13]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -290,7 +294,8 @@ for sub_env in "${sub_env_array[@]}"; do
 
     ########## Trigger5 #########
     if [[ "${line[${COLUMN_INDEXES[16]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger5_Type is empty or whitespace hence Skipping Full Trigger5 values"
+        #echo " Trigger5_Type is empty or whitespace hence Skipping Full Trigger5 values"
+        :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[16]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -331,7 +336,8 @@ for sub_env in "${sub_env_array[@]}"; do
 
         ########## Trigger6 #########
     if [[ "${line[${COLUMN_INDEXES[19]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger6_Type is empty or whitespace hence Skipping Full Trigger6 values"
+        #echo " Trigger6_Type is empty or whitespace hence Skipping Full Trigger6 values"
+        :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[19]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -372,7 +378,8 @@ for sub_env in "${sub_env_array[@]}"; do
 
         ########## Trigger7 #########
     if [[ "${line[${COLUMN_INDEXES[22]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger7_Type is empty or whitespace hence Skipping Full Trigger7 values"
+       # echo " Trigger7_Type is empty or whitespace hence Skipping Full Trigger7 values"
+       :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[22]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -416,7 +423,8 @@ for sub_env in "${sub_env_array[@]}"; do
       
    ########## Trigger8 #########
     if [[ "${line[${COLUMN_INDEXES[25]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger8_Type is empty or whitespace hence Skipping Full Trigger8 values"
+       # echo " Trigger8_Type is empty or whitespace hence Skipping Full Trigger8 values"
+       :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[25]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -459,7 +467,8 @@ for sub_env in "${sub_env_array[@]}"; do
 
     ########## Trigger9 #########
     if [[ "${line[${COLUMN_INDEXES[28]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger9_Type is empty or whitespace hence Skipping Full Trigger9 values"
+        #echo " Trigger9_Type is empty or whitespace hence Skipping Full Trigger9 values"
+        :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[28]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -500,7 +509,8 @@ for sub_env in "${sub_env_array[@]}"; do
 
        ########## Trigger10 #########
     if [[ "${line[${COLUMN_INDEXES[31]}]}" =~ ^[[:space:]]*$ ]]; then
-        echo " Trigger10_Type is empty or whitespace hence Skipping Full Trigger10 values"
+        #echo " Trigger10_Type is empty or whitespace hence Skipping Full Trigger10 values"
+        :
     else
         echo "      - type: ${line[${COLUMN_INDEXES[31]}]}" >> "$OUTPUT_VALUES_FILE"
         echo "        metadata:" >> "$OUTPUT_VALUES_FILE"
@@ -538,12 +548,12 @@ for sub_env in "${sub_env_array[@]}"; do
     fi
     ########## Trigger10 #########
                 
-                echo "Created YAML file: $OUTPUT_VALUES_FILE"
+                
             done < <(tail -n +2 "$INPUT_FILE")
 
 
- echo "All valid rows for $sub_env have been written to their respective YAML files."
+ #echo "All valid rows for $sub_env have been written to their respective YAML files."
 done
 
-
+echo "Created YAML file: $OUTPUT_VALUES_FILE"
 echo "All valid rows have been written to their respective YAML files"
